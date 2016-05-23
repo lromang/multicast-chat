@@ -7,14 +7,14 @@ import controller.CausalHandler;
 import controller.CommandListener;
 
 public class Application implements CommandListener {
-	
-	private CausalHandler causalHandler;
-	private ChatGUI chatGUI;
-	
-	public Application(String groupIp, int port, int ttl, int repPortServer, int repPortClient) throws IOException {
-		causalHandler = new CausalHandler(groupIp, port, ttl, repPortServer, repPortClient);
-		chatGUI = new ChatGUI();
-	}
+
+    private CausalHandler causalHandler;
+    private ChatGUI chatGUI;
+
+    public Application(String groupIp, int port, int ttl, int repPortServer, int repPortClient) throws IOException {
+        causalHandler = new CausalHandler(groupIp, port, ttl, repPortServer, repPortClient);
+        chatGUI = new ChatGUI();
+    }
 
 	/**
 	 * Create process id by concat ip and name
@@ -29,7 +29,7 @@ public class Application implements CommandListener {
 	public String getIpFromProcessId(String processId) {
 		return processId.split(Config.PROCESS_ID_TOKEN)[0];
 	}
-	
+
 	/**
 	 * Add listeners and start application
 	 */
@@ -61,7 +61,7 @@ public class Application implements CommandListener {
 		int ttl = args.length>=3 ? Integer.parseInt(args[2]) : Config.TTL;
 		int repPortServer = args.length>=4 ? Integer.parseInt(args[3]) : Config.REPEATER_PORT_SERVER;
 		int repPortClient = args.length>=5 ? Integer.parseInt(args[4]) : Config.REPEATER_PORT_CLIENT;
-		
+
 		try {
 			Logger.println("Group " + groupIp + ":" + port + " with TTL " + ttl + 
 					" and repeaters " + repPortServer + " " + repPortClient);
@@ -69,7 +69,7 @@ public class Application implements CommandListener {
 		} catch (IOException e) {
 			Logger.println("IOException in Application: " + e.getMessage());
 		}
-		
+
 	}
 
 }

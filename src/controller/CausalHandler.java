@@ -28,9 +28,7 @@ public class CausalHandler extends Thread {
 	private VectorClock vectorClock;
 	private String ip;
 	private String processId;
-	
 	private volatile boolean running = true;
-
 	private RepeaterHandler repeaterHandler;
 	private CommandListener commandListener = null;
 
@@ -43,21 +41,19 @@ public class CausalHandler extends Thread {
 		this.repPortClient = repPortClient;
 		this.vectorClock = new VectorClock();
 		this.ip = InetAddress.getLocalHost().getHostAddress();
-
 		this.repeaterHandler = new RepeaterHandler(repPortServer);
 	}
-	
+
 	public void addCommandListener(CommandListener commandListener) {
 		this.commandListener = commandListener;
 	}
 
 	/**
-	 * 
 	 * @param name
 	 * @throws IOException
 	 */
 	public void logon(String name) {
-		if(commandListener!=null) {
+		if(commandListener != null) {
 			processId = commandListener.createProcesId(ip, name);
 			try {
 				multicastSocket.joinGroup(group);
@@ -69,9 +65,8 @@ public class CausalHandler extends Thread {
 			}
 		}
 	}
-	
+
 	/**
-	 * 
 	 * @throws IOException
 	 */
 	public void logoff() {
@@ -104,7 +99,7 @@ public class CausalHandler extends Thread {
 		VectorClock piggybackedVectorClock = (VectorClock) vectorClock.Clone();
 		try {
 			Message message = new Message(processId, messageId, piggybackedVectorClock, payload);
-			byte[] buffer = MessageHandler.getByteFrom(message);
+			byte[] buffer   = MessageHandler.getByteFrom(message);
 			DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length, group, port);
 			multicastSocket.send(datagramPacket);
 			Logger.println("Broadcasted message " + message.toString());
@@ -114,10 +109,10 @@ public class CausalHandler extends Thread {
 			Logger.println("IOException in CausalHandler broadcast: " + e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Check if a received message is corrupted
-	 * 
+	 *
 	 * @param message
 	 * @return
 	 * @throws IOException
@@ -125,13 +120,13 @@ public class CausalHandler extends Thread {
 	private boolean isCorrupted(Message message) throws IOException {
 		byte[] receivedDigest = message.getDigest();
 		byte[] computedDigest = IntegrityHandler.getDigest(message);
-		
+
 		return !(IntegrityHandler.compareDigests(receivedDigest, computedDigest));
 	}
-	
+
 	/**
 	 * Request retransmission of message from its ID
-	 * 
+	 *
 	 * @param ip
 	 * @param messageId
 	 * @param length
@@ -146,7 +141,7 @@ public class CausalHandler extends Thread {
 		Socket socket = new Socket(ip, repPortClient);
 		InputStream in = socket.getInputStream();
 		OutputStream out = socket.getOutputStream();
-		
+
 		do {
 			out.write(MessageHandler.getByteFrom(request));
 			out.flush();
@@ -156,7 +151,7 @@ public class CausalHandler extends Thread {
 			socket.close();
 			in.close();
 			out.close();
-			
+
 			corrupted = isCorrupted(message);
 			if(corrupted) {
 				Logger.println("Corrupted message " + message.toString());
@@ -164,17 +159,17 @@ public class CausalHandler extends Thread {
 		} while(corrupted);
 		return message;
 	}
-	
+
 	/**
 	 * Thread that receives messages and manages the correct causal ordering
 	 */
 	public void run() {
 		Message receivedMessage, requestedMessage;
-		int seen, sent;
-		String process;
-		
+		int     seen, sent;
+		String  process;
+
 		while(running) {
-			try {
+                    try {
 				byte[] buffer = new byte[Config.MAX_BUFFER_DIM];
 				DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length);
 				// blocking method
@@ -185,7 +180,7 @@ public class CausalHandler extends Thread {
 					// for testing we miss messages with a certain probability
 					if(Math.random()>Config.MISSING_PROB) {
 						Logger.println("Received message " + receivedMessage.toString());
-						
+
 						VectorClock piggybackedVectorClock = receivedMessage.getPiggybackedVectorClock();
 						Iterator<String> it = piggybackedVectorClock.getProcessIds().iterator();
 

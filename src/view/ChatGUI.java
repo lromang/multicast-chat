@@ -164,7 +164,7 @@ public class ChatGUI implements ActionListener, KeyListener, WindowListener {
 	}
 
 	public void windowClosing(WindowEvent e) {
-		String[] options = {"Yes", "No"};
+		String[] options = {"Si", "No"};
 		int i = JOptionPane.showOptionDialog(
 				frame, 
 				Config.GUI_CLOSE_MESSAGE, 

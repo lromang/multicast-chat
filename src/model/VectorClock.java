@@ -28,7 +28,7 @@ public class VectorClock implements Serializable, Cloneable {
 		vectorClock.put(processId, value);
 		return value;
 	}
-	
+
 	public void set(String processId, int value) {
 		vectorClock.put(processId, value);
 	}
@@ -78,7 +78,7 @@ public class VectorClock implements Serializable, Cloneable {
 		}
 		return result + "]";
 	}
-	
+
 	public Object Clone() {
 		VectorClock vectorClockClone = null;
 		try {

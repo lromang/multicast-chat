@@ -10,7 +10,7 @@ import view.Config;
 import controller.IntegrityHandler;
 
 public class Message implements Serializable, Comparable<Message> {
-	
+
 	private static final long serialVersionUID = -1041013198570731751L;
 	private String processId;
 	private int messageId;
@@ -18,7 +18,7 @@ public class Message implements Serializable, Comparable<Message> {
 	private VectorClock vectorClock;
 	private byte[] digest;
 	private Date receiveDate;
-	
+
 	public Message(String processId, int messageId, VectorClock vectorClock, Payload payload) throws IOException {
 		this.processId = processId;
 		this.messageId = messageId;
@@ -26,15 +26,15 @@ public class Message implements Serializable, Comparable<Message> {
 		this.vectorClock = vectorClock;
 		this.digest = IntegrityHandler.getDigest(payload);
 	}
-	
+
 	public String getProcessId() {
 		return processId;
 	}
-	
+
 	public Payload getPayload() {
 		return payload;
 	}
-	
+
 	public int getMessageId() {
 		return messageId;
 	}
@@ -42,19 +42,19 @@ public class Message implements Serializable, Comparable<Message> {
 	public VectorClock getPiggybackedVectorClock() {
 		return vectorClock;
 	}
-	
+
 	public byte[] getDigest() {
 		return digest;
 	}
-	
+
 	public Date getReceiveDate() {
 		return receiveDate;
 	}
-	
+
 	public void setReceiveDate(Date receiveDate) {
 		this.receiveDate = receiveDate;
 	}
-	
+
 	public String toString() {
 		return messageId + " by " + processId + " " + getPiggybackedVectorClock().toString();
 	}
@@ -66,12 +66,12 @@ public class Message implements Serializable, Comparable<Message> {
 
 		int v1, v2;
 		int result = Config.CONCURRENT;
-		
 		int i = 0;
+
 		for(String id : keys) {
 			v1 = vectorClock.get(id);
 			v2 = message.getPiggybackedVectorClock().get(id);
-			
+
 			if(v1<v2) {
 				if(i==0 || result==Config.LESS) {
 					result = Config.LESS;
@@ -107,14 +107,14 @@ public class Message implements Serializable, Comparable<Message> {
 			}
 			i++;
 		}
-		
+
 		if(result==Config.CONCURRENT) {
 			result = receiveDate.compareTo(message.getReceiveDate());
 		}
-		
+
 		return result;
 	}
-	
+
 	private Vector<String> unionSet(Set<String> s1, Set<String> s2) {
 		Vector<String> union = new Vector<String>();
 		union.addAll(s1);
@@ -125,5 +125,5 @@ public class Message implements Serializable, Comparable<Message> {
 		}
 		return union;
 	}
-	
+
 }

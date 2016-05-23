@@ -13,20 +13,20 @@ import view.Config;
 import view.Logger;
 
 public class RepeaterHandler extends Thread {
-	
+
 	private volatile boolean running = true;
-	
+
 	private Vector<Message> history;
 	private ServerSocket serverSocket;
-	
+
 	public RepeaterHandler(int port) throws IOException {
 		this.history = new Vector<Message>();
 		this.serverSocket = new ServerSocket(port);
 	}
-	
+
 	/**
 	 * Update history of locally sent messages
-	 * 
+	 *
 	 * @param message
 	 */
 	public synchronized void addToHistory(Message message) {
@@ -36,10 +36,10 @@ public class RepeaterHandler extends Thread {
 		}
 		history.add(message);
 	}
-	
+
 	/**
 	 * Find message in history from its ID
-	 * 
+	 *
 	 * @param messageId
 	 * @return
 	 */
@@ -51,10 +51,10 @@ public class RepeaterHandler extends Thread {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Stop service
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public void logoff() throws IOException {
 		running = false;
@@ -62,7 +62,7 @@ public class RepeaterHandler extends Thread {
 			serverSocket.close();
 		}
 	}
-	
+
 	/**
 	 * Thread that listens for retransmission requests
 	 */
@@ -70,7 +70,7 @@ public class RepeaterHandler extends Thread {
 		Socket client;
 		byte[] buffer = new byte[Config.MAX_REQUEST_DIM];
 		Message message = null;
-		
+
 		while(running) {
 			try {
 				// blocking method, listen for requests
@@ -81,10 +81,10 @@ public class RepeaterHandler extends Thread {
 				// get requested message from history and send it
 				Request request = MessageHandler.getRequestMessageFrom(buffer);
 				message = findMessageInHistory(request.getMessageId());
-				
+
 				Logger.println("Received request from " + client.getInetAddress().getHostAddress() + 
 						" to retransmit message " + request.getMessageId() + " | found: " + (message!=null));
-				
+
 				out.write(MessageHandler.getByteFrom(message));
 				out.flush();
 				client.close();
